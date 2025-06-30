@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:15
+    container_name: sensor_data_db
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pgdata:/var/lib/postgresql/data
+  mqtt_broker:
+    image: eclipse-mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./configs/mosquitto.conf:/mosquitto/config/mosquitto.conf
+  publisher:
+    image: 107570342011.dkr.ecr.eu-west-1.amazonaws.com/mqtt-publisher:latest
+    restart: unless-stopped    
+    depends_on:
+      - mqtt_broker
+    environment:
+      - MQTT_BROKER=mqtt_broker
+      - MQTT_PORT=1883
+
+  subscriber:
+    image: 107570342011.dkr.ecr.eu-west-1.amazonaws.com/mqtt-subscriber:latest
+    restart: unless-stopped
+    depends_on:
+      - mqtt_broker
+    env_file:
+      - .env
+
+volumes:
+  pgdata:

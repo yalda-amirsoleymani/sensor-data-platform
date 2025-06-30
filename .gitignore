@@ -1,0 +1,36 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environment
+.venv/
+.env/
+
+# VSCode / PyCharm
+.vscode/
+.idea/
+
+# Docker files
+*.log
+*.pid
+*.bak
+*.swp
+*.tmp
+
+# Pytest cache
+.pytest_cache/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Environment vars
+.env
+*.env
+
+# DB and volumes
+*.db
+docker-volume/
+
+# Secrets
+config/*.secret.json
