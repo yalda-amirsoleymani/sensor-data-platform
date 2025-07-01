@@ -1,21 +1,21 @@
-name: Test OIDC AWS Role Authentication
-
-permissions:
-  id-token: write
-  contents: read
+name: Deploy to AWS ECR
 
 on:
   push:
     branches:
-      - main   # or your branch
+      - main   # or your default branch
+
+permissions:
+  id-token: write      # needed for OIDC auth
+  contents: read       # to clone repo
 
 jobs:
-  test-auth:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v2
@@ -23,6 +23,19 @@ jobs:
           role-to-assume: arn:aws:iam::107570342011:role/GitHubActions-ECR-Role
           aws-region: eu-west-1
 
-      - name: Test AWS CLI access
-        run: aws sts get-caller-identity
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push publisher image
+        run: |
+          docker build -t mqtt-publisher ./publisher
+          docker tag mqtt-publisher:latest 107570342011.dkr.ecr.eu-west-1.amazonaws.com/mqtt-publisher:latest
+          docker push 107570342011.dkr.ecr.eu-west-1.amazonaws.com/mqtt-publisher:latest
+
+      - name: Build, tag, and push subscriber image
+        run: |
+          docker build -t mqtt-subscriber ./subscriber
+          docker tag mqtt-subscriber:latest 107570342011.dkr.ecr.eu-west-1.amazonaws.com/mqtt-subscriber:latest
+          docker push 107570342011.dkr.ecr.eu-west-1.amazonaws.com/mqtt-subscriber:latest
 
