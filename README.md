@@ -80,3 +80,23 @@ Core Tables:
 | value         | FLOAT      | Actual value that caused alarm|
 | status        | FLOAT      | "high", "resolved", etc.      |
 
+
+API Endpoint Design:
+
+| Method | Endpoint                               | Description               |
+| ------ | -------------------------------------- | ------------------------- |
+| GET    | `/health`                              | Health check              |
+| GET    | `/locations`                           | List all locations        |
+| GET    | `/locations/:location_id`              | One location              |
+| GET    | `/locations/:location_id/devices`      | Devices at location       |
+| GET    | `/devices`                             | All devices               |
+| GET    | `/devices/:device_id`                  | One device                |
+| GET    | `/readings/latest?limit=15`            | Latest readings           |
+| GET    | `/devices/:device_id/readings`         | Readings by device        |
+| GET    | `/readings?start=&end=&limit=&offset=` | Filtered readings         |
+| GET    | `/alarms`                              | All alarms                |
+| GET    | `/alarms?status=active`                | Alarms filtered by status |
+| GET    | `/devices/:device_id/alarms`           | Alarms for device         |
+| GET    | `/alarm-types`                         | Alarm definitions         |
+| GET    | `/alarm-types/:alarm_type`             | Details on alarm rule     |
+

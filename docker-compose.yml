@@ -2,7 +2,7 @@ services:
   db:
     image: postgres:15
     container_name: sensor_data_db
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
     ports:
@@ -32,6 +32,15 @@ services:
       - mqtt_broker
     env_file:
       - .env
-
+  api:
+    build:
+      context: ./sensor-api
+    container_name: sensor_api
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./sensor-api/.env
+    depends_on:
+      - db
 volumes:
   pgdata:
