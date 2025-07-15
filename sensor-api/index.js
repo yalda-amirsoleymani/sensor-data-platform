@@ -3,7 +3,6 @@ const app = express();
 const morgan = require('morgan');
 require('dotenv').config();
 const PORT = process.env.PORT || 3000;
-const { login, requireAuth } = require('./auth');
 
 // Middleware
 app.use(morgan('dev'));
@@ -16,7 +15,7 @@ const alarmTypesRoutes = require('./routes/alarmTypesRoutes');
 const devicesRoutes = require('./routes/devicesRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 const locationsRoutes = require('./routes/locationsRoutes');
-const authRoutes = require('./routes/authRoutes');
+const loginRoutes = require('./routes/loginRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
 // Use routes with API prefixes
@@ -26,7 +25,7 @@ app.use('/api/alarm-types', alarmTypesRoutes);
 app.use('/api/devices', devicesRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/locations', locationsRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/api/login', loginRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Root endpoint
