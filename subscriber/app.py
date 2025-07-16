@@ -19,6 +19,7 @@ DB_NAME = os.getenv("RDS_DB")
 def connect_postgres():
     for attempt in range(10):
         try:
+            print(f"@@@ THIS IS A TEST0 MESSAGE @@@")
             conn = psycopg2.connect(
                 host=DB_HOST,
                 port=DB_PORT,
@@ -31,9 +32,11 @@ def connect_postgres():
         except Exception as e:
 #        except psycopg2.OperationalError as e:
             print(f"PostgreSQL not ready (attempt {attempt + 1}/10), retrying in 5s...")
+            print(f"@@@ THIS IS A TEST1 MESSAGE @@@")
             print("ERROR: ", e)
             time.sleep(5)
     print("Could not connect to PostgreSQL after several attempts.")
+    print(f"@@@ THIS IS A TEST2 MESSAGE @@@")
     return None
 
 
