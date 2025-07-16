@@ -10,11 +10,11 @@ MQTT_BROKER = os.getenv('MQTT_BROKER')
 MQTT_PORT = int(os.getenv('MQTT_PORT'))
 TOPIC = "sensors/data"
 
-DB_HOST = "db"
+DB_HOST = os.getenv("RDS_HOST")
 DB_PORT = 5432
-DB_USER = os.getenv("POSTGRES_USER")
-DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-DB_NAME = os.getenv("POSTGRES_DB")
+DB_USER = os.getenv("RDS_USER")
+DB_PASSWORD = os.getenv("RDS_PASSWORD")
+DB_NAME = os.getenv("RDS_DB")
 
 def connect_postgres():
     for attempt in range(10):
@@ -28,8 +28,10 @@ def connect_postgres():
             )
             print("Connected to PostgreSQL")
             return conn
-        except psycopg2.OperationalError:
+        except Exception as e:
+#        except psycopg2.OperationalError as e:
             print(f"PostgreSQL not ready (attempt {attempt + 1}/10), retrying in 5s...")
+            print("ERROR: ", e)
             time.sleep(5)
     print("Could not connect to PostgreSQL after several attempts.")
     return None
@@ -55,13 +57,16 @@ def on_connect(client, userdata, flags, rc):
     print("Connected to MQTT broker with result code " + str(rc))
     client.subscribe(TOPIC)
 
+
+count = 0
+
 def on_message(client, userdata, msg):
+    global count
     print(f"Received message on {msg.topic}: {msg.payload}")
     data = json.loads(msg.payload)
     device_id = random.choice(list(range(1,10)))
 
-    # Keep DB insertion commented out for now:
-    if cur:
+    if cur and count < 5:
         cur.execute("""
             INSERT INTO sensor_readings (device_id, co2, gas, smoke, temperature, battery_level)
             VALUES (%s, %s, %s, %s, %s, %s)
@@ -74,7 +79,10 @@ def on_message(client, userdata, msg):
             data.get("battery_level")
         ))
         conn.commit()
-        print("Inserted data into DB")
+        count += 1
+        print(f"Inserted data into DB. Count: {count}")
+    elif count >= 5:
+        print("Reached 5 inserts, skipping further DB writes.")
 
 # Initialize MQTT client
 client = mqtt.Client()
@@ -84,3 +92,4 @@ client.on_message = on_message
 # Connect to MQTT broker
 connect_mqtt(client)
 client.loop_forever()
+
