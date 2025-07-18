@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+const fs = require('fs');
 require('dotenv').config();
 
 const pool = new Pool({
@@ -7,8 +8,11 @@ const pool = new Pool({
   user: process.env.RDS_USER,
   password: process.env.RDS_PASSWORD,
   database: process.env.RDS_DB,
-});
-//const pool = new Pool({
+  ssl: {
+    rejectUnauthorized: true,
+    ca: fs.readFileSync('./eu-west-1-bundle.pem').toString()
+  }
+});//const pool = new Pool({
 //  host: process.env.POSTGRES_HOST || 'localhost',
 //  port: process.env.POSTGRES_PORT ? Number(process.env.POSTGRES_PORT) : 5432,
 //  user: process.env.POSTGRES_USER,
